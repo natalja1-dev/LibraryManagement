@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,16 +47,25 @@ public class BookController {
         this.borrowRecordRepository = borrowRecordRepository;
     }
 
+    // import org.springframework.data.domain.Pageable;
+    // import org.springframework.data.domain.Page;
+
     // ✅ Get all books
     @GetMapping
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public Page<Book> getAllBooks(
+            //@RequestParam int size,
+            //@RequestParam int page
+            Pageable pageable
+    ) {
+        return bookRepository.findAll(pageable);
     }
+
+
     @GetMapping("/search")
     public List<Book> searchBooks(@RequestParam("q") String keyword) {
         return bookRepository.searchBooks(keyword);
     }
-    
+
     // ✅ Get single book (with borrow info)
     @GetMapping("/{id}")
     public ResponseEntity<?> getBookById(@PathVariable int id) {
@@ -78,7 +89,7 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/add-multiple")
+    @PostMapping("add-multiple")
     public List<Book> addMultipleBooks(@RequestBody List<Book> books) {
         bookRepository.saveAll(books);
         return bookRepository.findAll();
